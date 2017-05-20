@@ -1,0 +1,424 @@
+const bot = require('./bot');
+const Discord = require('discord.js');
+const truncate = require('truncate');
+const encodeUrl = require('encodeurl');
+const moment = require('moment');
+const humanizeDuration = require('humanize-duration');
+
+exports.randomSelection = (choices) => {
+    return choices[Math.floor(Math.random() * choices.length)];
+};
+
+exports.randomColor = () => {
+    return [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
+};
+
+exports.randomString = (length) => {
+    const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let result = '';
+
+    for (let i = length; i > 0; --i)
+        result += this.randomSelection(chars);
+
+    return result;
+};
+
+exports.formatNumber = (number) => {
+    if (isNaN(number)) return NaN;
+    let input = `${number}`;
+    if (number < 1e4) return input;
+    const out = [];
+    while (input.length > 3) {
+        out.push(input.substr(input.length - 3, input.length));
+        input = input.substr(0, input.length - 3);
+    }
+    return `${input},${out.reverse().join(',')}`;
+};
+
+exports.assertEmbedPermission = (channel, member) => {
+    if (!(channel instanceof Discord.TextChannel))
+        throw bot.client.consts.phrase('require_instance', { instance: 'Discord.TextChannel' });
+
+    if (!(member instanceof Discord.GuildMember))
+        throw bot.client.consts.phrase('require_instance', { instance: 'Discord.GuildMember' });
+
+    if (!channel.permissionsFor(member).has('EMBED_LINKS'))
+        throw 'No permission to use embed in this channel!';
+};
+
+exports.embed = (title = '', description = '', fields = [], options = {}) => {
+    const url = options.url || '';
+    const color = options.color || this.randomColor();
+
+    fields.length = Math.min(25, fields.length);
+
+    fields = fields.map(obj => {
+        if (options.inline)
+            obj.inline = true;
+
+        if (obj.value.length > 1024)
+            obj.value = truncate(obj.value, 1023);
+
+        return obj;
+    });
+
+    if (title.length > 256)
+        title = truncate(title, 255);
+    if (url !== '')
+        description += '\n';
+    if (description.length > 2000)
+        description = truncate(description, 1999);
+
+    return new Discord.RichEmbed({ fields, video: options.video || url })
+        .setTitle(title)
+        .setColor(color)
+        .setDescription(description)
+        .setImage(options.image || url)
+        .setTimestamp(timestampToDate(options.timestamp) || null)
+        .setFooter(options.footer || '', options.avatarFooter ? bot.client.user.avatarURL : (options.footerIcon || null))
+        .setAuthor(options.author === undefined ? '' : options.author)
+        .setThumbnail(options.thumbnail || null);
+};
+
+const timestampToDate = (timestamp) => {
+    if (timestamp === true) {
+        return new Date();
+    }
+    if (typeof timestamp === 'number') {
+        return new Date(timestamp);
+    }
+    return timestamp;
+};
+
+/* NOTE: This is a function to format embed with a predefined structure
+         (primarily used to format fields, so it is required to specify the fields) */
+exports.formatEmbed = (title = '', description = '', nestedFields, options = {}) => {
+    if (!nestedFields || typeof nestedFields != 'object')
+        throw 'Nested fields info is not an object!';
+
+    const fields = nestedFields.map(parentField => {
+        const tmp = {
+            name: `${parentField.icon || '❯'}\u2000${parentField.title}`,
+            value: parentField.fields.map(field => {
+                let t = '';
+                if (options.code)
+                    t += '```' + options.code + '\n';
+                if (field.name)
+                    t += `•\u2000${field.name}: `;
+                if (field.value.length > 1024 && field.hasOwnProperty('alt'))
+                    t += field.alt;
+                else
+                    t += field.value;
+                if (options.code)
+                    t += '\n```';
+                return t;
+            }).join('\n')
+        };
+        if (parentField.inline)
+            tmp.inline = parentField.inline;
+        return tmp;
+    });
+
+    if (options.simple) {
+        let content = '';
+        for (let i = 0; i < fields.length; i++)
+            content += `\n**${fields[i].name}:**\n${fields[i].value}`;
+        if (options.footer)
+            content += `\n*${options.footer}*`;
+        return content.trim();
+    }
+
+    delete options.code;
+    delete options.simple;
+    return this.embed(title, description, fields, options);
+};
+
+exports.formatLargeEmbed = (title = '', description = '', values, options = {}) => {
+    if (!values || typeof values != 'object')
+        throw 'Values info is not an object!';
+
+    if (!values.delimeter || !values.children)
+        throw 'Missing required properties from values info!';
+
+    const embed = this.embed(title, description, [], options);
+
+    const sections = [];
+    let temp = [];
+    for (const child of values.children) {
+        if (!child)
+            continue;
+
+        if ((temp.join(values.delimeter).length ? temp.join(values.delimeter).length + values.delimeter.length + child.length : child.length) > 1024) {
+            sections.push(temp);
+            temp = [];
+        }
+
+        temp.push(child);
+    }
+    sections.push(temp);
+
+    sections.length = Math.min(25, sections.length);
+
+    for (let section of sections) {
+        if (section.length > 1024)
+            section = truncate(section, 1023);
+
+        embed.addField(values.sectionTitle || '---', section.join(values.delimeter), true);
+    }
+
+    return embed;
+};
+
+exports.parseArgs = (args, options) => {
+    if (!options)
+        return args;
+    if (typeof options === 'string')
+        options = [options];
+
+    const optionValues = {};
+
+    let i;
+    for (i = 0; i < args.length; i++) {
+        const arg = args[i];
+        if (!arg.startsWith('-')) {
+            break;
+        }
+
+        const label = arg.substr(1);
+
+        if (options.indexOf(label + ':') > -1) {
+            const leftover = args.slice(i + 1).join(' ');
+            const matches = leftover.match(/^"(.+?)"/);
+            if (matches) {
+                optionValues[label] = matches[1];
+                i += matches[0].split(' ').length;
+            } else {
+                i++;
+                optionValues[label] = args[i];
+            }
+        } else if (options.indexOf(label) > -1) {
+            optionValues[label] = true;
+        } else {
+            break;
+        }
+    }
+
+    return {
+        options: optionValues,
+        leftover: args.slice(i)
+    };
+};
+
+exports.multiSend = (channel, messages, delay) => {
+    delay = delay || 100;
+    messages.forEach((m, i) => {
+        setTimeout(() => {
+            channel.send(m);
+        }, delay * i);
+    });
+};
+
+exports.sendLarge = (channel, largeMessage, options = {}) => {
+    let message = largeMessage;
+    const messages = [];
+    const prefix = options.prefix || '';
+    const suffix = options.suffix || '';
+
+    const max = 2000 - prefix.length - suffix.length;
+
+    while (message.length >= max) {
+        let part = message.substr(0, max);
+        let cutTo = max;
+        if (options.cutOn) {
+            cutTo = part.lastIndexOf(options.cutOn);
+            part = part.substr(0, cutTo);
+        }
+        messages.push(prefix + part + suffix);
+        message = message.substr(cutTo);
+    }
+
+    if (message.length > 1) {
+        messages.push(prefix + message + suffix);
+    }
+
+    this.multiSend(channel, messages, options.delay);
+};
+
+exports.playAnimation = (msg, delay, list) => {
+    if (list.length < 1)
+        return;
+
+    const next = list.shift();
+    const start = this.now();
+
+    msg.edit(next).then(() => {
+        const elapsed = this.now() - start;
+
+        setTimeout(() => {
+            this.playAnimation(msg, delay, list);
+        }, Math.max(50, delay - elapsed));
+    }).catch(msg.error);
+};
+
+exports.now = () => {
+    const now = process.hrtime();
+    return now[0] * 1e3 + now[1] / 1e6;
+};
+
+/* NOTE: This function will return "x days ago" if it is more than a single day,
+         but will still return hours, minutes and seconds when it is less than a single day */
+exports.fromNow = (date) => {
+    if (!date)
+        return false;
+
+    const days = moment().diff(date, 'd');
+
+    if (days > 1)
+        return `${days} days ago`;
+    else
+        return moment(date).fromNow();
+};
+
+exports.humanizeDuration = (durationMs, short = false) => {
+    const shortOps = {
+        round: true,
+        spacer: '',
+        delimeter: ' and ',
+        largest: 2,
+        language: 'shortEn',
+        languages: {
+            shortEn: {
+                y:  () => { return 'y'; },
+                mo: () => { return 'mo'; },
+                w:  () => { return 'w'; },
+                d:  () => { return 'd'; },
+                h:  () => { return 'h'; },
+                m:  () => { return 'm'; },
+                s:  () => { return 's'; }
+            }
+        }
+    };
+
+    const defaultOps = {
+        round: true
+    };
+
+    return humanizeDuration(durationMs, short ? shortOps : defaultOps);
+};
+
+/* NOTE: A Promise which will return a cached message from a channel.
+         If msgId is not provided, then it will return the previous message.
+         Optionally, it can also be asked to fetch message instead. */
+exports.getMsg = (channel, msgId = undefined, curMsg = undefined) => {
+    return new Promise((resolve, reject) => {
+        if (!(channel instanceof Discord.TextChannel || channel instanceof Discord.DMChannel))
+            return reject(bot.client.consts.phrase('require_instance', { instance: 'Discord.TextChannel or Discord.DMChannel' }));
+
+        if (msgId && isNaN(parseInt(msgId)))
+            return reject('Invalid message ID. It must only contain numbers!');
+
+        const foundMsg = channel.messages.get(msgId || channel.messages.keyArray()[channel.messages.size - 2]);
+
+        if (!foundMsg && curMsg) {
+            channel.fetchMessages({
+                limit: 1,
+                around: msgId,
+                before: curMsg
+            }).then(msgs => {
+                if (msgs.size < 1 || (msgId ? msgs.first().id != msgId : false))
+                    return reject('Message could not be fetched from the channel!');
+
+                resolve(msgs.first());
+            }).catch(reject);
+        } else if (foundMsg) {
+            resolve(foundMsg);
+        } else {
+            reject('Message could not be found in the channel!');
+        }
+    });
+};
+
+/* NOTE: A function which will return a user from the guild by @mention, full tag or
+         partial/case-insensitive display name (has fallback feature). */
+exports.getGuildMember = (guild, keyword = undefined, fallback = undefined) => {
+    if (keyword) {
+        if (!(guild instanceof Discord.Guild))
+            throw bot.client.consts.phrase('require_instance', { instance: 'Discord.Guild' });
+
+        keyword = keyword.trim();
+
+        const isMention = /<@!?(\d+?)>/g.exec(keyword);
+        if (isMention) {
+            return [guild.members.get(isMention[1]), true];
+        }
+
+        const isTag = keyword.indexOf('#') !== -1;
+        if (isTag) {
+            return [guild.members.find(m => m.user.tag == keyword), false];
+        }
+
+        const filter = guild.members.filter(m => {
+            return m.displayName.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+        });
+
+        if (filter.size > 1)
+            throw bot.client.consts.phrase('found_x_error', { x: `${filter.size} members` });
+        else if (filter.size == 1)
+            return [filter.first(), false];
+    }
+
+    if (fallback)
+        return [fallback, false];
+
+    throw bot.client.consts.phrase('x_not_found', { x: 'Guild member' });
+};
+
+exports.getGuildRole = (guild, keyword) => {
+    if (!(guild instanceof Discord.Guild))
+        throw bot.client.consts.phrase('require_instance', { instance: 'Discord.Guild' });
+
+    keyword = keyword.trim();
+
+    const find = guild.roles.find('name', keyword);
+
+    if (find)
+        return find;
+
+    const filter = guild.roles.filter(r => {
+        return r.name.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
+    });
+
+    if (filter.size > 1)
+        throw bot.client.consts.phrase('found_x_error', { x: `${filter.size} roles` });
+    else if (filter.size == 1)
+        return filter.first();
+
+    throw bot.client.consts.phrase('x_not_found', { x: 'Guild role' });
+};
+
+exports.pad = (pad, str, padLeft) => {
+    if (typeof str === 'undefined')
+        return pad;
+    if (padLeft) {
+        return (pad + str).slice(-pad.length);
+    } else {
+        return (str + pad).substring(0, pad.length);
+    }
+};
+
+/*
+ * NOTE: One-liner utils...
+ */
+
+exports.cleanUrl = (url) => {
+    url = url.replace(/ /g, '+');
+    return encodeUrl(url).replace(/\(/g, '%40').replace(/\)/g, '%41');
+};
+
+exports.isArgsMention = (args) => {
+    return (args.length && args[0].indexOf('<@') === 0);
+};
+
+exports.toYesNo = (bool) => {
+    return bool ? 'yes' : 'no';
+};
