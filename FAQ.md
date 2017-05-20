@@ -9,6 +9,6 @@ Please read the [official Yarn installation instructions for Linux](http://yarnp
 > This means you did not set up the `config.json` for the bot.  
 Please read the [Lightbringer installation instructions](https://github.com/BobbyWibowo/Lightbringer#installing).
 
-- My game isn't showing after using `//setgame`!
+- My game isn't showing after using `lbsetgame`!
 > This isn't a bug, it's just how Discord works. It can't be fixed.  
-Don't worry, your game shows for everyone else. If you want to check your game, just use `//userinfo`.
+Don't worry, your game shows for everyone else. If you want to check your game, just use `lbuserinfo`.
