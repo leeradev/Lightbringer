@@ -37,11 +37,12 @@ const db = bot.db = new XPDB(path.join(dataFolder, 'db'));
 let loaded = false;
 
 bot.on('ready', () => {
+    bot.parentDirectory = path.join(__dirname, '../..');
     bot.utils = require('./utils');
     bot.consts = require('./consts.js');
 
-    const cmdsPath = bot.cmdsPath = path.join(__dirname, 'commands');
-    commands.loadCommands(cmdsPath);
+    bot.commandsDirectory = path.join(__dirname, 'commands');
+    commands.loadCommands(bot.commandsDirectory);
 
     (title => {
         process.title = title;

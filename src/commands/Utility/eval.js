@@ -51,9 +51,9 @@ exports.run = (bot, msg, args) => {
 
         let disout = result.error ? result.error.toString() : require('util').inspect(result.output, { depth: 0 });
         // NOTE: Replace token
-        disout = disout.replace(new RegExp(`${bot.token.split('').join('[^]{0,2}')}|${bot.token.split('').reverse().join('[^]{0,2}')}`, 'g'), '[TOKEN]');
+        disout = disout.replace(new RegExp(`${bot.token.split('').join('[^]{0,2}')}|${bot.token.split('').reverse().join('[^]{0,2}')}`, 'g'), '<Token>');
         // NOTE: Replace path
-        disout = disout.replace(new RegExp(`${__dirname}\/`, 'g'), '<Directory>./');
+        disout = disout.replace(new RegExp(bot.parentDirectory, 'g'), '<Parent>');
 
         const timeTaken = elapsedTimeNs < 1e9 ? `${(elapsedTimeNs / 1e6).toFixed(3)} ms` : `${(elapsedTimeNs / 1e9).toFixed(3)} s`;
         const formatted = bot.utils.formatEmbed('', '',

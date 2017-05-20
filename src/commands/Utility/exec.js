@@ -18,13 +18,14 @@ exports.run = (bot, msg, args) => {
         cutOn: '\n'
     };
 
-    ps.stdout.on('data', data => bot.utils.sendLarge(msg.channel, clean(data), opts));
-    ps.stderr.on('data', data => bot.utils.sendLarge(msg.channel, clean(data), opts));
+    ps.stdout.on('data', data => bot.utils.sendLarge(msg.channel, clean(data, bot.parentDirectory), opts));
+    ps.stderr.on('data', data => bot.utils.sendLarge(msg.channel, clean(data, bot.parentDirectory), opts));
 };
 
-const clean = (data) => {
+const clean = (data, parent) => {
     return data.toString()
-        .replace(new RegExp(username, 'g'), '<Hidden>')
+        .replace(new RegExp(parent, 'g'), '<Parent>')
+        .replace(new RegExp(username, 'g'), '<Username>')
         .replace(/\[[0-9]*m/g, '');
 };
 
