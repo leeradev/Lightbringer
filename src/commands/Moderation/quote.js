@@ -21,18 +21,21 @@ exports.run = (bot, msg, args) => {
                     {
                         name: 'ID',
                         value: m.id
-                    },
-
+                    }
                 ]
             }
         ];
 
-        if (channel.type == 'text')
+        if (channel.id != msg.channel.id)
             nestedFields[0].fields.push(
                 {
                     name: 'Channel',
-                    value: channel.type == 'text' ? `#${channel.name} (${channel.id})` : channel.type.toUpperCase()
-                },
+                    value: channel.type == 'text' ? `#${channel.name} (${channel.id})` :  (channel.type == 'dm' ? `DM with ${channel.recipient.tag}` : channel.type.toUpperCase())
+                }
+            );
+
+        if (channel.type == 'text' && channel.guild.id != msg.guild.id)
+            nestedFields[0].fields.push(
                 {
                     name: 'Guild',
                     value: `${channel.guild.name} (${channel.guild.id})`

@@ -14,28 +14,28 @@ exports.run = (bot, msg, args) => {
     if (args.length) {
         if (/^r(oles)?$/i.test(args[0])) {
             const roles = msg.guild.roles.sort((a, b) => b.position - a.position);
-            embed = bot.utils.formatLargeEmbed('', stripIndents`
-                ${bot.consts.phrase('self_destruct_in_t', { t: '60 seconds' })}
-
-                ${msg.guild.large ? bot.consts.phrase('lg_role_members') : ''}
-                `,
+            embed = bot.utils.formatLargeEmbed('', bot.consts.phrase('self_destruct_in_t', { t: '60 seconds' }),
                 {
                     delimeter: ', ',
-                    children: roles.map(r => `${r.name} [${r.members.size}]`)
+                    children: roles.map(r => r.name)
                 }
             ).setAuthor(`Roles of ${msg.guild.name} [${msg.guild.roles.size}]`, msg.guild.iconURL);
         } else {
             throw bot.consts.phrase('invalid_action');
         }
     } else {
-        embed = bot.utils.formatEmbed('', bot.consts.phrase('self_destruct_in_t', { t: '60 seconds' }),
+        embed = bot.utils.formatEmbed('', stripIndents`
+            ${bot.consts.phrase('self_destruct_in_t', { t: '60 seconds' })}
+
+            ${msg.guild.large ? bot.consts.phrase('lg_role_members') : ''}
+            `,
             [
                 {
                     title: 'Information',
                     fields: [
                         {
                             name: 'Owner',
-                            value: `${msg.guild.owner.user.tag} (${msg.guild.owner.id})`
+                            value: msg.guild.owner ? `${msg.guild.owner.user.tag} (${msg.guild.owner.id})` : msg.guild.ownerID
                         },
                         {
                             name: 'Default channel',

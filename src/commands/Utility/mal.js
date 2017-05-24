@@ -7,7 +7,7 @@ const moment = require('moment');
 const resultsPerPage = 10;
 
 exports.run = (bot, msg, args) => {
-    if (!bot.config.malUser || bot.config.malUser.length < 1 || !bot.config.malPass || bot.config.malPass.length < 1)
+    if (!bot.config.malUser || !bot.config.malPassword)
         throw 'MyAnimeList username or password is missing from config.json';
 
     if (msg.guild)
@@ -21,7 +21,7 @@ exports.run = (bot, msg, args) => {
         throw bot.consts.phrase('empty_search');
 
     msg.edit(bot.consts.phrase('searching_x_on_y', { x: query, y: 'MyAnimeList' })).then(() => {
-        const mal = popura(bot.config.malUser, bot.config.malPass);
+        const mal = popura(bot.config.malUser, bot.config.malPassword);
 
         mal.verifyAuth().then(auth => {
             if (auth.username !== bot.config.malUser)

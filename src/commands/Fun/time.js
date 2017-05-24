@@ -6,7 +6,7 @@ exports.run = (bot, msg, args) => {
     const location = args.join(' ') || bot.config.defaultTimeZone || false;
 
     snekfetch.get(`${timeIsURL}${location}`).then(res => {
-        const text = res.body;
+        const text = res.text || res.body.toString();
 
         const date = text.match(/<div id="dd" class="w90 tr" onclick="location='\/calendar'" title="Click for calendar">([^]+?)<\/div>/)[1];
         const time = text.match(/<div id="twd">([^]+?)<\/div>/)[1].replace(/<span id="ampm" style="font-size:21px;line-height:21px">(AM|PM)<\/span>/, ' $1');
@@ -15,13 +15,7 @@ exports.run = (bot, msg, args) => {
         const tMoment = moment(`${date} ${time}`, 'dddd, MMMM D, YYYY HH:mm:ss A');
 
         msg.edit(`${clock} The time in '${place}' is ${tMoment.format(bot.consts.fullDateFormat)}.`);
-    }).catch(err => {
-        if (err.status === 404) {
-            msg.error(`Location ${location} not found.`);
-        } else {
-            msg.error(`Time.is errored: ${err}`);
-        }
-    });
+    }).catch(err => msg.error(err.status == 404 ? `Location ${location} not found.` : err));
 };
 
 exports.info = {
