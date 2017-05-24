@@ -5,8 +5,6 @@ exports.run = (bot, msg) => {
         if (!res || !res.body)
             return msg.error('Could not fetch data');
 
-        console.log(require('util').inspect(res));
-
         msg.edit(res.body.joke);
     }).catch(msg.error);
 };
