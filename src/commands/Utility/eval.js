@@ -13,10 +13,11 @@ exports.run = (bot, msg, args) => {
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
 
     const input = parsed.leftover.join(' ');
-    const beginTime = process.hrtime();
 
+    let beginTime;
     new Promise(resolve => {
         new Promise(resolve => {
+            beginTime = process.hrtime();
             resolve(eval(input));
         }).then(output =>
             resolve({ output, error: false })
@@ -54,6 +55,8 @@ exports.run = (bot, msg, args) => {
         disout = disout.replace(new RegExp(`${bot.token.split('').join('[^]{0,2}')}|${bot.token.split('').reverse().join('[^]{0,2}')}`, 'g'), '<Token>');
         // NOTE: Replace path
         disout = disout.replace(new RegExp(bot.parentDirectory, 'g'), '<Parent>');
+        // NOTE: Replace quote
+        disout = disout.replace(new RegExp('`', 'g'), '\\`');
 
         const timeTaken = elapsedTimeNs < 1e9 ? `${(elapsedTimeNs / 1e6).toFixed(3)} ms` : `${(elapsedTimeNs / 1e9).toFixed(3)} s`;
         const formatted = bot.utils.formatEmbed('', '',

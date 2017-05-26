@@ -5,5 +5,6 @@ exports.run = (bot, msg) => {
 exports.info = {
     name: 'restart',
     usage: 'restart',
-    description: 'Restarts the bot'
+    description: 'Restarts the bot',
+    aliases: ['res']
 };

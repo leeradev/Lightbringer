@@ -23,7 +23,7 @@ exports.run = (bot, msg, args) => {
         });
     }
 
-    if (/a(dd)?|c(reate)?/i.test(args[0])) {
+    if (/^a(dd)?$|^c(reate)?$/i.test(args[0])) {
         if (args.length < 3)
             throw `Usage: \`${bot.config.prefix}shortcut add <id> <command>\``;
 
@@ -41,7 +41,7 @@ exports.run = (bot, msg, args) => {
                 msg.success(`Created shortcut \`${id}\`!`)
             );
         });
-    } else if (/d(el(ete)?)?|r(em(ove)?)?/i.test(args[0])) {
+    } else if (/^d(el(ete)?)?$|^r(em(ove)?)?$/i.test(args[0])) {
         if (args.length < 2)
             throw `Usage: \`${bot.config.prefix}shortcut remove <id>\``;
 

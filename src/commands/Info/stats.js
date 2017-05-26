@@ -54,15 +54,15 @@ exports.run = (bot, msg) => {
                                     fields: [
                                         {
                                             name: 'Sent',
-                                            value: bot.managers.stats.get('messages-sent')
+                                            value: bot.managers.stats.get('messages-sent').toLocaleString()
                                         },
                                         {
                                             name: 'Received',
-                                            value: bot.managers.stats.get('messages-received')
+                                            value: bot.managers.stats.get('messages-received').toLocaleString()
                                         },
                                         {
                                             name: 'Mentions',
-                                            value: bot.managers.stats.get('mentions')
+                                            value: bot.managers.stats.get('mentions').toLocaleString()
                                         },
                                         {
                                             name: 'Guilds',

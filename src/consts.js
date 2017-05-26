@@ -8,7 +8,6 @@ exports.shortDateFormat = 'MMM Do, YYYY';
 
 exports.phrases = {
     'self_destruct_in_t': '*This message will self-destruct in %t%.*',
-    'lg_role_members': '***Note:*** *Since this is a large guild, members info can be inaccurate.*',
     'guild_only': 'This command can only be used in a guild!',
     'specify_role': 'You must specify a role name!',
     'invalid_action': 'That action is not valid!',
@@ -20,7 +19,8 @@ exports.phrases = {
     'found_x_error': 'Found %x% with that keyword. Please use a more specific keywords!',
     'no_matches': 'No matches found!',
     'mention_to_x': '@mention some people to %x%!',
-    'require_type': 'You must specify a type!%suf%'
+    'require_type': 'You must specify a type!%suf%',
+    'time_taken_to_rfm': 'Time taken to re-fetch members: %t%'
 };
 
 exports.phrase = (phrase = '', args = undefined) => {

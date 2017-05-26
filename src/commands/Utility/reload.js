@@ -1,16 +1,15 @@
-exports.run = (bot, msg, args) => {
-    if (args.length < 1)
-        throw 'You must specify a module name to reload!';
+exports.run = (bot, msg) => {
+    const reload = bot.commands.loadCommands(bot.commandsDirectory, '-a');
 
-    if (bot.commands.loadCommand(args.join(' '), bot.commandsDirectory, true))
-        msg.success('Module successfully reloaded!');
+    if (!isNaN(parseInt(reload)))
+        msg.success(`${reload} module${reload != 1 ? 's were' : ' was'} successfully reloaded!`);
     else
         msg.error('An unexpected error occurred while trying to reload the module!');
 };
 
 exports.info = {
     name: 'reload',
-    usage: 'reload <module>',
-    description: 'Reloads a module',
+    usage: 'reload',
+    description: 'Reloads all modules',
     aliases: ['r']
 };

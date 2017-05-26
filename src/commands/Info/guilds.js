@@ -1,22 +1,18 @@
-const oneLine = require('common-tags').oneLine;
-
 exports.run = (bot, msg) => {
     if (msg.guild)
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
 
-    const servers = bot.guilds.array().sort((a, b) => b.memberCount - a.memberCount).map(guild => {
-        return {
-            name: guild.name,
-            value: oneLine`
-                ${guild.memberCount} user${guild.memberCount == 1 ? 's' : ''},
-                ${guild.channels.size} channel${guild.channels.size == 1 ? 's' : ''}
-            `
-        };
-    });
-
-    msg.edit({ embed:
-        bot.utils.embed(`${bot.user.username}'s Servers [${bot.guilds.size}]`, '\u200b', servers, { inline: true })
-    }).catch(msg.error);
+    msg.edit(msg.content, { embed:
+        bot.utils.formatLargeEmbed('', bot.consts.phrase('self_destruct_in_t', { t: '240 seconds' }),
+            {
+                delimeter: '\n',
+                children: bot.guilds.sort((a, b) => b.memberCount - a.memberCount).map(g => `•\u2000**${g.name}** - ${g.memberCount} member${g.memberCount != 1 ? 's' : ''}, ${g.channels.size} channel${g.channels.size ? 's' : ''}`)
+            },
+            {
+                inline: false
+            }
+        ).setAuthor(`${bot.user.username}'s guilds [${bot.guilds.size}]`, bot.user.displayAvatarURL)
+    }).then(m => m.delete(240000)).catch(msg.error);
 };
 
 exports.info = {

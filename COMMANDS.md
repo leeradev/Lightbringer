@@ -93,6 +93,11 @@
 *Description:* `Spaces out text to look all dramatic n' stuff`  
 *Usage:* `space [amount] <text>`
 
+### `spongememe`  
+*Description:* `Turns a specific message into a SpongeBob meme (this command is cancerous!)`  
+*Usage:* `spongememe [-t] [id] [channel]`  
+*Aliases:* `sm`
+
 ### `time`  
 *Description:* `Prints current time in yours or a particular location (using Time.is)`  
 *Usage:* `time [location]`  
@@ -141,10 +146,10 @@
 *Usage:* `roleinfo <role name>`  
 *Aliases:* `role`
 
-### `serverinfo`  
+### `guildinfo`  
 *Description:* `Shows info of the server you are in`  
-*Usage:* `serverinfo [roles]`  
-*Aliases:* `server`
+*Usage:* `guildinfo [roles|members|channels]`  
+*Aliases:* `guild`, `server`, `serverinfo`
 
 ### `stats`  
 *Description:* `Shows you stats about SharpBot`  
@@ -158,10 +163,6 @@
 *Description:* `Shows yours or another user's info`  
 *Usage:* `userinfo [user]`  
 *Aliases:* `info`
-
-### `users`  
-*Description:* `Lists all users on your current server`  
-*Usage:* `users`
 
 ## Moderation  
 ### `clone`  
@@ -266,11 +267,13 @@
 
 ### `restart`  
 *Description:* `Restarts the bot`  
-*Usage:* `restart`
+*Usage:* `restart`  
+*Aliases:* `res`
 
 ### `reload`  
-*Description:* `Reloads a module`  
-*Usage:* `reload <module>`
+*Description:* `Reloads all modules`  
+*Usage:* `reload`  
+*Aliases:* `r`
 
 ### `setgame`  
 *Description:* `Sets your game (shows for other people)`  

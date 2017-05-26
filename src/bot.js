@@ -163,6 +163,9 @@ bot.on('message', msg => {
     });
 });
 
+// NOTE: Cache members of newly joined guilds
+bot.on('guildCreate', guild => guild.fetchMembers());
+
 process.on('exit', () => {
     bot.db.unwrap().close();
     loaded && bot.destroy();

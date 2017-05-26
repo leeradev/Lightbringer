@@ -8,15 +8,6 @@ const ratings = {
     'u': 'N/A'
 };
 
-const getHostName = (url) => {
-    const match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
-    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
-        return match[2];
-    } else {
-        return null;
-    }
-};
-
 exports.run = (bot, msg, args) => {
     if (msg.guild)
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
@@ -37,8 +28,8 @@ exports.run = (bot, msg, args) => {
 
             const image = images[0];
             const imageUrl = bot.utils.cleanUrl(image.common.file_url);
-            const imageFull = `[${getHostName(imageUrl) || 'Click here'}](${imageUrl})`;
-            const imageSource = image.common.source.length < 1 ? 'N/A' : (isAbsoluteUrl(image.common.source) ? `[${getHostName(image.common.source) || 'Click here'}](${bot.utils.cleanUrl(image.common.source)})` : image.common.source);
+            const imageFull = `[${bot.utils.getHostName(imageUrl) || 'Click here'}](${imageUrl})`;
+            const imageSource = image.common.source.length < 1 ? 'N/A' : (isAbsoluteUrl(image.common.source) ? `[${bot.utils.getHostName(image.common.source) || 'Click here'}](${bot.utils.cleanUrl(image.common.source)})` : image.common.source);
 
             msg.edit(prev, { embed:
                 bot.utils.formatEmbed('', '',

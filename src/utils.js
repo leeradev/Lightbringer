@@ -66,8 +66,10 @@ exports.embed = (title = '', description = '', fields = [], options = {}) => {
         title = truncate(title, 255);
     if (url !== '')
         description += '\n';
-    if (description.length > 2000)
-        description = truncate(description, 1999);
+
+    // NOTE: Spare 1 character to deal with description length issues with the API
+    if (description.length > 1999)
+        description = truncate(description, 1998);
 
     return new Discord.RichEmbed({ fields, video: options.video || url })
         .setTitle(title)
@@ -90,8 +92,18 @@ const timestampToDate = (timestamp) => {
     return timestamp;
 };
 
-/* NOTE: This is a function to format embed with a predefined structure
-         (primarily used to format fields, so it is required to specify the fields) */
+/**
+ * utils.formatEmbed - This is a function to format embed
+ * with a predefined structure (primarily used to format
+ * fields, so it is required to specify the fields)
+ *
+ * @param {string} [title=]
+ * @param {string} [description=]
+ * @param {Object} nestedFields
+ * @param {Object} [options={}]
+ *
+ * @returns {Discord.RichEmbed}
+ */
 exports.formatEmbed = (title = '', description = '', nestedFields, options = {}) => {
     if (!nestedFields || typeof nestedFields != 'object')
         throw 'Nested fields info is not an object!';
@@ -111,7 +123,7 @@ exports.formatEmbed = (title = '', description = '', nestedFields, options = {})
                     t += field.value;
                 if (options.code)
                     t += '\n```';
-                return t;
+                return t.trim();
             }).join('\n')
         };
         if (parentField.inline)
@@ -153,7 +165,7 @@ exports.formatLargeEmbed = (title = '', description = '', values, options = {}) 
             temp = [];
         }
 
-        temp.push(child);
+        temp.push(child.trim());
     }
     sections.push(temp);
 
@@ -265,8 +277,15 @@ exports.now = () => {
     return now[0] * 1e3 + now[1] / 1e6;
 };
 
-/* NOTE: This function will return "x days ago" if it is more than a single day,
-         but will still return hours, minutes and seconds when it is less than a single day */
+/**
+ * utils.fromNow - This function will return "x days ago" if
+ * it is more than a single day, but will still return hours,
+ * minutes and seconds when it is less than a single day.
+ *
+ * @param {Date} date
+ *
+ * @returns {string}
+ */
 exports.fromNow = (date) => {
     if (!date)
         return false;
@@ -306,10 +325,19 @@ exports.humanizeDuration = (durationMs, short = false) => {
     return humanizeDuration(durationMs, short ? shortOps : defaultOps);
 };
 
-/* NOTE: A Promise which will return a cached message from a channel.
-         If msgId is not provided, then it will return the previous message.
-         Optionally, it can also be asked to fetch message instead. */
+/**
+ * utils.getMsg - A Promise which will return a cached message from a
+ * channel. If msgId is not provided, then it will return the previous
+ * message. Optionally, it can also be asked to fetch message instead.
+ *
+ * @param {(Discord.TextChannel|Discord.DMChannel)} channel
+ * @param {number} [msgId=undefined]
+ * @param {number} [curMsg=undefined]
+ *
+ * @returns {Discord.Message}
+ */
 exports.getMsg = (channel, msgId = undefined, curMsg = undefined) => {
+
     return new Promise((resolve, reject) => {
         if (!(channel instanceof Discord.TextChannel || channel instanceof Discord.DMChannel))
             return reject(bot.client.consts.phrase('require_instance', { instance: 'Discord.TextChannel or Discord.DMChannel' }));
@@ -338,8 +366,17 @@ exports.getMsg = (channel, msgId = undefined, curMsg = undefined) => {
     });
 };
 
-/* NOTE: A function which will return a user from the guild by @mention, full tag or
-         partial/case-insensitive display name (has fallback feature). */
+/**
+ * utils.getGuildMember - A function which will return
+ * a user from the guild by @mention, full tag or
+ * partial/case-insensitive display name (has fallback feature).
+ *
+ * @param {Discord.Guild} guild
+ * @param {string} [keyword=undefined]
+ * @param {Discord.GuildMember} [fallback=undefined]
+ *
+ * @returns {Array}
+ */
 exports.getGuildMember = (guild, keyword = undefined, fallback = undefined) => {
     if (keyword) {
         if (!(guild instanceof Discord.Guild))
@@ -348,27 +385,25 @@ exports.getGuildMember = (guild, keyword = undefined, fallback = undefined) => {
         keyword = keyword.trim();
 
         const isMention = /<@!?(\d+?)>/g.exec(keyword);
-        if (isMention) {
+        if (isMention)
             return [guild.members.get(isMention[1]), true];
-        }
 
         const isTag = keyword.indexOf('#') !== -1;
-        if (isTag) {
-            return [guild.members.find(m => m.user.tag == keyword), false];
-        }
+        if (isTag)
+            return [guild.members.find(m => m.user && m.user.tag == keyword), false];
 
-        const filter = guild.members.filter(m => {
-            return m.displayName.toLowerCase().indexOf(keyword.toLowerCase()) !== -1;
-        });
+        const filter = guild.members.filter(m =>
+            (m.nickname && m.nickname.toLowerCase().indexOf(keyword.toLowerCase()) !== -1) ||
+            (m.user && m.user.username.toLowerCase().indexOf(keyword.toLowerCase()) !== -1)
+        );
 
         if (filter.size > 1)
             throw bot.client.consts.phrase('found_x_error', { x: `${filter.size} members` });
         else if (filter.size == 1)
             return [filter.first(), false];
-    }
-
-    if (fallback)
+    } else if (fallback) {
         return [fallback, false];
+    }
 
     throw bot.client.consts.phrase('x_not_found', { x: 'Guild member' });
 };
@@ -406,19 +441,51 @@ exports.pad = (pad, str, padLeft) => {
     }
 };
 
-/*
+exports.getHostName = (url) => {
+    const match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
+    if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
+        return match[2];
+    } else {
+        return null;
+    }
+};
+
+exports.cleanCustomEmojis = (text) => {
+    if (!text)
+        return '';
+
+    return text.replace(/<(:\w+?:)\d+?>/g, '$1');
+};
+
+exports.fetchGuildMembers = (guild, cache = false) => {
+    if (!(guild instanceof Discord.Guild))
+        throw bot.client.consts.phrase('require_instance', { instance: 'Discord.Guild' });
+
+    return new Promise((resolve, reject) => {
+        if (cache)
+            return resolve({
+                guild,
+                time: ''
+            });
+
+        const beginTime = process.hrtime();
+        guild.fetchMembers().then(g => {
+            const elapsedTime = process.hrtime(beginTime);
+            const elapsedTimeNs = elapsedTime[0] * 1e9 + elapsedTime[1];
+            resolve({
+                guild: g,
+                time: elapsedTimeNs < 1e9 ? `${(elapsedTimeNs / 1e6).toFixed(3)} ms` : `${(elapsedTimeNs / 1e9).toFixed(3)} s`
+            });
+        }).catch(reject);
+    });
+};
+
+/**
  * NOTE: One-liner utils...
  */
 
-exports.cleanUrl = (url) => {
-    url = url.replace(/ /g, '+');
-    return encodeUrl(url).replace(/\(/g, '%40').replace(/\)/g, '%41');
-};
+exports.cleanUrl = url => encodeUrl(url.replace(/ /g, '+')).replace(/\(/g, '%40').replace(/\)/g, '%41');
 
-exports.isArgsMention = (args) => {
-    return (args.length && args[0].indexOf('<@') === 0);
-};
+exports.isArgsMention = args => args.length && args[0].indexOf('<@') === 0;
 
-exports.toYesNo = (bool) => {
-    return bool ? 'yes' : 'no';
-};
+exports.toYesNo = bool => bool ? 'yes' : 'no';

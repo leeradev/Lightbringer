@@ -5,7 +5,7 @@
   "main": "src/bot.js",
   "scripts": {
     "start": "gulp",
-    "background": "screen -dmS sharpBot gulp"
+    "background": "screen -dmS lightbringer gulp"
   },
   "author": "",
   "license": "MIT",

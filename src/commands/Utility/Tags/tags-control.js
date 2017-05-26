@@ -16,7 +16,7 @@ exports.run = (bot, msg, args) => {
                     delimeter: '\n',
                     children: tags.map(tag => {
                         const prefix = `**${tag.name}** [${tag.used}]: \``;
-                        return prefix + truncate(tag.contents, 1024 - prefix.length - 2) + '`';
+                        return prefix + truncate(bot.utils.cleanCustomEmojis(tag.contents), 1024 - prefix.length - 2) + '`';
                     })
                 })
             }).then(m => m.delete(60000));

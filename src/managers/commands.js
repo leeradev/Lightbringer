@@ -24,45 +24,36 @@ class CommandManager {
         return null;
     }
 
-    loadCommands(folder) {
-        this._commands = [];
-        this._categories = [];
+    loadCommands(folder, manual = undefined) {
+        let i = 0;
+        if (manual === '-a') {
+            for (const c of this._commands)
+                if (c.info._filePath)
+                    if (delete require.cache[c.info._filePath])
+                        i++;
+            this._commands = [];
+            this._categories = [];
+        } else if (manual !== undefined) {
+            throw 'The bot can\'t reload individual command for the time being.';
+        }
 
         read.fileSync(folder).forEach(file => this.loadCommand(file, folder));
+        return i;
     }
 
-    loadCommand(file, folder, manual = false) {
+    loadCommand(file, folder) {
         const bot = this.bot;
-        let old;
-        let _path;
 
-        if (manual) {
-            old = this.get(file);
-            if (!old)
-                throw 'Module with that name could not be found!';
+        file = file.substr(folder.length + 1);
+        const basename = path.basename(file);
 
-            _path = old.info._path;
+        if (basename.startsWith('_') || !basename.endsWith('.js')) return;
 
-            file = _path.substr(folder.length + 1);
-
-            if (!this._commands.splice(this._commands.indexOf(old), 1) || !delete require.cache[_path])
-                throw 'Could not remove the module from cache!';
-        } else {
-            file = file.substr(folder.length + 1);
-
-            const basename = path.basename(file);
-            if (basename.startsWith('_') || !basename.endsWith('.js'))
-                return;
-
-            _path = `${folder}/${file}`;
-        }
-
-        const command = require(_path);
+        const _filePath = `${folder}/${file}`;
+        const command = require(_filePath);
         const error = this._validateCommand(command);
-        if (error) {
-            bot.logger.severe(`Failed to load '${file}': ${chalk.red(error)}`);
-            return;
-        }
+        if (error)
+            return bot.logger.severe(`Failed to load '${file}': ${chalk.red(error)}`);
 
         if (!command.category) {
             const category = file.indexOf(path.sep) > -1 ? path.dirname(file) : 'Uncategorized';
@@ -72,9 +63,9 @@ class CommandManager {
                 this._categories.push(category);
         }
 
-        command.info._path = _path;
+        command.info._filePath = _filePath;
 
-        return this._commands.push(command);
+        this._commands.push(command);
     }
 
     all(category) {
