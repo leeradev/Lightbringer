@@ -98,7 +98,7 @@ const getHelp = (bot, command, single) => {
     }
 
     return {
-        name: single ? '\u200b' : command.info.name,
+        name: single ? '---' : command.info.name,
         value: description
     };
 };
@@ -106,5 +106,6 @@ const getHelp = (bot, command, single) => {
 exports.info = {
     name: 'help',
     usage: 'help all|[command]|[category <name>]',
-    description: 'Shows you help for all commands or just a single command'
+    description: 'Shows you help for all commands or just a single command',
+    aliases: ['h']
 };

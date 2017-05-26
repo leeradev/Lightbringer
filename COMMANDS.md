@@ -51,6 +51,11 @@
 *Usage:* `insult <user-1> [user-2] ... [user-n]`  
 *Credits:* `Twentysix#5252`
 
+### `jumbo`  
+*Description:* `Sends the emojis as image attachments`  
+*Usage:* `jumbo <emojis>`  
+*Aliases:* `j`, `large`
+
 ### `kill`  
 *Description:* `Kills some users`  
 *Usage:* `kill <user-1> [user-2] ... [user-n]`  
@@ -128,7 +133,8 @@
 
 ### `help`  
 *Description:* `Shows you help for all commands or just a single command`  
-*Usage:* `help all|[command]|[category <name>]`
+*Usage:* `help all|[command]|[category <name>]`  
+*Aliases:* `h`
 
 ### `inrole`  
 *Description:* `Shows a list of members which have the specified role`  
@@ -268,8 +274,8 @@
 *Aliases:* `res`
 
 ### `reload`  
-*Description:* `Reloads all modules`  
-*Usage:* `reload`  
+*Description:* `Reloads all modules (or optionally reload 'utils', 'consts', 'extended')`  
+*Usage:* `reload [utils|consts|extended]`  
 *Aliases:* `r`
 
 ### `setgame`  

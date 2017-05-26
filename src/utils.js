@@ -5,7 +5,7 @@ const encodeUrl = require('encodeurl');
 const moment = require('moment');
 const humanizeDuration = require('humanize-duration');
 
-exports.randomSelection = (choices) => {
+exports.randomSelection = choices => {
     return choices[Math.floor(Math.random() * choices.length)];
 };
 
@@ -13,7 +13,7 @@ exports.randomColor = () => {
     return [Math.floor(Math.random() * 256), Math.floor(Math.random() * 256), Math.floor(Math.random() * 256)];
 };
 
-exports.randomString = (length) => {
+exports.randomString = length => {
     const chars = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let result = '';
 
@@ -23,7 +23,7 @@ exports.randomString = (length) => {
     return result;
 };
 
-exports.formatNumber = (number) => {
+exports.formatNumber = number => {
     if (isNaN(number)) return NaN;
     let input = `${number}`;
     if (number < 1e4) return input;
@@ -49,10 +49,15 @@ exports.assertEmbedPermission = (channel, member) => {
 exports.embed = (title = '', description = '', fields = [], options = {}) => {
     const url = options.url || '';
     const color = options.color || this.randomColor();
+    const footer = options.footer || '';
+    const author = typeof options.author == 'string' ? options.author : '';
+    let maxLength = 2000;
 
     fields.length = Math.min(25, fields.length);
 
     fields = fields.map(obj => {
+        maxLength -= obj.name.length + obj.value.length;
+
         if (options.inline)
             obj.inline = true;
 
@@ -67,9 +72,11 @@ exports.embed = (title = '', description = '', fields = [], options = {}) => {
     if (url !== '')
         description += '\n';
 
-    // NOTE: Spare 1 character to deal with description length issues with the API
-    if (description.length > 1999)
-        description = truncate(description, 1998);
+    // NOTE: Temporary countermeasure against
+    // description length issue with Discord API
+    maxLength -= title.length + footer.length + author.length;
+    if (description.length > maxLength)
+        description = truncate(description, maxLength - 1);
 
     return new Discord.RichEmbed({ fields, video: options.video || url })
         .setTitle(title)
@@ -77,12 +84,12 @@ exports.embed = (title = '', description = '', fields = [], options = {}) => {
         .setDescription(description)
         .setImage(options.image || url)
         .setTimestamp(timestampToDate(options.timestamp) || null)
-        .setFooter(options.footer || '', options.avatarFooter ? bot.client.user.avatarURL : (options.footerIcon || null))
-        .setAuthor(options.author === undefined ? '' : options.author)
+        .setFooter(footer, options.avatarFooter ? bot.client.user.avatarURL : (options.footerIcon || null))
+        .setAuthor(author)
         .setThumbnail(options.thumbnail || null);
 };
 
-const timestampToDate = (timestamp) => {
+const timestampToDate = timestamp => {
     if (timestamp === true) {
         return new Date();
     }
@@ -286,7 +293,7 @@ exports.now = () => {
  *
  * @returns {string}
  */
-exports.fromNow = (date) => {
+exports.fromNow = date => {
     if (!date)
         return false;
 
@@ -441,7 +448,7 @@ exports.pad = (pad, str, padLeft) => {
     }
 };
 
-exports.getHostName = (url) => {
+exports.getHostName = url => {
     const match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
     if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
         return match[2];
@@ -450,7 +457,7 @@ exports.getHostName = (url) => {
     }
 };
 
-exports.cleanCustomEmojis = (text) => {
+exports.cleanCustomEmojis = text => {
     if (!text)
         return '';
 
@@ -485,7 +492,5 @@ exports.fetchGuildMembers = (guild, cache = false) => {
  */
 
 exports.cleanUrl = url => encodeUrl(url.replace(/ /g, '+')).replace(/\(/g, '%40').replace(/\)/g, '%41');
-
-exports.isArgsMention = args => args.length && args[0].indexOf('<@') === 0;
 
 exports.toYesNo = bool => bool ? 'yes' : 'no';

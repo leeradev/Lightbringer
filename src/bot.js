@@ -38,6 +38,8 @@ let loaded = false;
 
 bot.on('ready', () => {
     bot.parentDirectory = path.join(__dirname, '../..');
+    bot.srcDirectory = __dirname;
+
     bot.utils = require('./utils');
     bot.consts = require('./consts.js');
 

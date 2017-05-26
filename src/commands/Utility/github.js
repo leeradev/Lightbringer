@@ -12,7 +12,7 @@ exports.run = (bot, msg, args) => {
     if (args[0].indexOf('/') !== -1) {
         const repo = safeRepo(args[0]);
 
-        msg.edit(`🔄\u2000Loading info for '${repo}'\u2026`);
+        msg.edit(`🔄\u2000Loading info for \`${repo}\`\u2026`);
 
         snekfetch.get(`https://api.github.com/repos/${repo}`).then(res => {
             if (res.body.message === 'Not Found')
@@ -21,16 +21,16 @@ exports.run = (bot, msg, args) => {
             msg.edit(prev, { embed: buildEmbedFromJson(bot, res.body) });
         }).catch(msg.error);
     } else {
-        msg.edit(bot.consts.phrase('searching_x', { x: args.join(' ') }));
+        const query = args.join(' ');
+        msg.edit(bot.consts.phrase('searching_x', { x: query }));
 
         snekfetch.get(`https://api.github.com/search/repositories?q=${args.join('+')}`).then(res => {
-            if (res.body.total_count < 1) return msg.error(`😢\u2000No results found for '${args.join(' ')}'`);
+            if (res.body.items.length < 1)
+                return msg.error(`😢\u2000No results found for '${args.join(' ')}'`);
 
-            const count = Math.min(3, res.body.total_count);
+            const count = res.body.items.length = Math.min(3, res.body.items.length);
 
-            console.log(require('util').inspect(res.body.items[1], { depth: 0 }));
-
-            msg.channel.send(`✅\u2000Top ${count} results:`).then(() => msg.edit(prev)).then(() => {
+            msg.channel.send(`✅\u2000Top ${count} results for \`${query}\`:`).then(() => msg.delete()).then(() => {
                 const sendResult = (i) => {
                     if (!res.body.items[i])
                         return;

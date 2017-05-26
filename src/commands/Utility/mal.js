@@ -8,7 +8,7 @@ const resultsPerPage = 10;
 
 exports.run = (bot, msg, args) => {
     if (!bot.config.malUser || !bot.config.malPassword)
-        throw 'MyAnimeList username or password is missing from config.json';
+        throw 'MyAnimeList username or password is missing from config.json file.';
 
     if (msg.guild)
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
@@ -25,7 +25,7 @@ exports.run = (bot, msg, args) => {
 
         mal.verifyAuth().then(auth => {
             if (auth.username !== bot.config.malUser)
-                return msg.error('MyAnimeList auth did not return the expected value');
+                return msg.error('MyAnimeList auth did not return the expected value.');
 
             (parsed.options.m ? mal.searchMangas(query) : mal.searchAnimes(query)).then(res => {
                 if (!res || !res[0])
