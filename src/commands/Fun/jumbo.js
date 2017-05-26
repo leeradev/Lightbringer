@@ -4,8 +4,6 @@ exports.run = (bot, msg, args) => {
 
     const emojis = args.map(a => bot.emojis.find(e => e == a)).filter(a => a);
 
-    console.log(require('util').inspect(emojis));
-
     if (emojis.length < 1)
         throw 'Could not parse the emojis!';
 
