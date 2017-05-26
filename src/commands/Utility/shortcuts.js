@@ -16,7 +16,7 @@ exports.run = (bot, msg, args) => {
                     delimeter: '\n',
                     children: shortcuts.map(sc => {
                         const prefix = `**${sc.name}:** \``;
-                        return prefix + truncate(sc.command, 1024 - prefix.length - 2) + '`';
+                        return prefix + truncate(bot.utils.cleanCustomEmojis(sc.command), 1024 - prefix.length - 2) + '`';
                     })
                 })
             }).then(m => m.delete(60000));

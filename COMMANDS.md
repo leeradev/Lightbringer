@@ -32,6 +32,11 @@
 *Usage:* `flip <text>`  
 *Credits:* `1Computer1`
 
+### `get`  
+*Description:* `Get some things from some APIs`  
+*Usage:* `get [type]`  
+*Aliases:* `g`, `f`, `fetch`
+
 ### `gif`  
 *Description:* `Searches Giphy for GIFs`  
 *Usage:* `gif [-u] <query>`  
@@ -46,10 +51,6 @@
 *Usage:* `insult <user-1> [user-2] ... [user-n]`  
 *Credits:* `Twentysix#5252`
 
-### `joke`  
-*Description:* `Gives a random joke from http://tambal.azurewebsites.net/joke/random`  
-*Usage:* `joke`
-
 ### `kill`  
 *Description:* `Kills some users`  
 *Usage:* `kill <user-1> [user-2] ... [user-n]`  
@@ -58,10 +59,6 @@
 ### `meme`  
 *Description:* `N/A`  
 *Usage:* `meme list | info <name> | [<name> | <line 1> | <line 2> | [style]]`
-
-### `numbersapi`  
-*Description:* `Gives a random fact from http://numbersapi.com/random`  
-*Usage:* `numbersapi <date|math|year>`
 
 ### `random`  
 *Description:* `Shows you pictures of random cats or dogs`  

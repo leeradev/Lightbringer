@@ -100,7 +100,10 @@ exports.run = (bot, msg, args) => {
                                 value: voiceChannels.size
                             },
                             {
-                                value: `\nLists all channels with \`${bot.config.prefix}serverinfo channels\` command.`
+                                value: ''
+                            },
+                            {
+                                value: `Lists all channels with \`${bot.config.prefix}serverinfo channels\` command.`
                             }
                         ]
                     },

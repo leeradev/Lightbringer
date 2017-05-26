@@ -19,7 +19,6 @@ exports.phrases = {
     'found_x_error': 'Found %x% with that keyword. Please use a more specific keywords!',
     'no_matches': 'No matches found!',
     'mention_to_x': '@mention some people to %x%!',
-    'require_type': 'You must specify a type!%suf%',
     'time_taken_to_rfm': 'Time taken to re-fetch members: %t%'
 };
 

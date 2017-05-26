@@ -88,11 +88,9 @@ bot.on('ready', () => {
         bot.channels.get(config.statusChannel).send('✅\u2000Bot is ready!');
 });
 
-bot.on('message', msg => {
-    stats.increment(`messages-${bot.user.id === msg.author.id ? 'sent' : 'received'}`);
-
+const assertMentionLog = (_, msg) => {
     if (msg.isMemberMentioned(bot.user)) {
-        // Send to mentions log channel if necessary
+        // NOTE: Send to mentions log channel if necessary
         if (config.mentionLogChannel) {
             new Promise(resolve => {
                 if (msg.guild && msg.guild.id) {
@@ -114,16 +112,22 @@ bot.on('message', msg => {
             stats.increment('mentions');
         }
     }
+};
 
-    // Ignore if wasn't sent by bot's owner
+bot.on('message', msg => {
+    stats.increment(`messages-${bot.user.id === msg.author.id ? 'sent' : 'received'}`);
+
+    assertMentionLog(null, msg);
+
+    // NOTE: Ignore if wasn't sent by bot's owner
     if (msg.author.id !== bot.user.id)
         return;
 
-    // Ignore blacklisted servers
+    // NOTE: Ignore blacklisted servers
     if (msg.guild && config.blacklistedServers && config.blacklistedServers.indexOf(msg.guild.id.toString()) > -1)
         return;
 
-    // Return if message didn't start with prefix
+    // NOTE: Return if message didn't start with prefix
     if (!msg.content.toLowerCase().startsWith(config.prefix.toLowerCase()))
         return;
 
@@ -163,6 +167,8 @@ bot.on('message', msg => {
     });
 });
 
+bot.on('messageUpdate', assertMentionLog);
+
 // NOTE: Cache members of newly joined guilds
 bot.on('guildCreate', guild => guild.fetchMembers());
 
@@ -182,7 +188,7 @@ bot.on('disconnect', event => {
     process.exit(42); // Restart bot on disconnect
 });
 
-process.on('uncaughtException', (err) => {
+process.on('uncaughtException', err => {
     const errorMsg = (err ? err.stack || err : '').toString().replace(new RegExp(`${__dirname}\/`, 'g'), './');
     logger.severe(errorMsg);
 });
