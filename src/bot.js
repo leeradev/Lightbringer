@@ -106,7 +106,7 @@ const assertMentionLog = (_, msg) => {
                 }
             }).then(log => {
                 if (log) {
-                    bot.channels.get(config.mentionLogChannel).send(`${config.prefix}quote -c ${msg.id} ${msg.channel.id}`);
+                    bot.channels.get(config.mentionLogChannel).send(`${config.prefix}q -c ${msg.id} ${msg.channel.id}`);
                     stats.increment('mentions');
                 }
             });

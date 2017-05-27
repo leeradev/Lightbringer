@@ -53,7 +53,7 @@
 
 ### `jumbo`  
 *Description:* `Sends the emojis as image attachments`  
-*Usage:* `jumbo <emojis>`  
+*Usage:* `jumbo [-k] <emojis>`  
 *Aliases:* `j`, `large`
 
 ### `kill`  

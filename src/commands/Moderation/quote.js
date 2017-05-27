@@ -1,4 +1,3 @@
-const moment = require('moment');
 const filesize = require('filesize');
 
 exports.run = (bot, msg, args) => {
@@ -11,7 +10,7 @@ exports.run = (bot, msg, args) => {
     bot.utils.getMsg(channel, parsed.leftover[0], msg.id).then(m => {
         const options = {
             thumbnail: m.author.displayAvatarURL,
-            footer: moment(m.editedTimestamp || m.createdTimestamp).format(bot.consts.fullDateFormat)
+            timestamp: m.editedTimestamp || m.createdTimestamp
         };
 
         const nestedFields = [
@@ -42,22 +41,20 @@ exports.run = (bot, msg, args) => {
                 }
             );
 
-        const attachment = m.attachments.first();
-        if (attachment) {
+        const attachments = m.attachments.map(a => {
+            if ((a.width || a.height) && !options.image)
+                options.image = a.url;
+
+            return { value: `•\u2000[${a.filename}](${a.url}) - ${filesize(a.filesize)}` };
+        });
+
+        if (attachments.length)
             nestedFields.push(
                 {
-                    title: 'Attachment',
-                    fields: [
-                        {
-                            value: `[${attachment.filename}](${attachment.url}) - ${filesize(attachment.filesize)}`
-                        }
-                    ]
+                    title: `Attachment${attachments.length != 1 ? 's' : ''}`,
+                    fields: attachments
                 }
             );
-
-            if (attachment.width || attachment.height)
-                options.image = attachment.url;
-        }
 
         msg.edit(msg.content, { embed:
             bot.utils.formatEmbed('', parsed.options.c ? m.cleanContent : m.toString(), nestedFields, options)

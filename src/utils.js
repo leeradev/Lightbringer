@@ -130,7 +130,7 @@ exports.formatEmbed = (title = '', description = '', nestedFields, options = {})
                     t += field.value;
                 if (options.code)
                     t += '\n```';
-                return t.trim();
+                return t.replace(/^ +| +?$/g, ''); // t.trim();
             }).join('\n')
         };
         if (parentField.inline)

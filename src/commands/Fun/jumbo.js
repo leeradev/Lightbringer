@@ -1,35 +1,41 @@
 exports.run = (bot, msg, args) => {
-    if (args.length < 1)
+    const parsed = bot.utils.parseArgs(args, ['k']);
+
+    if (parsed.leftover.length < 1)
         throw 'You must enter at least one emoji!';
 
-    const emojis = args.map(a => bot.emojis.find(e => e == a)).filter(a => a);
+    const files = parsed.leftover.map(a => {
+        const emoji = bot.emojis.find(e => e == a);
 
-    if (emojis.length < 1)
-        throw 'Could not parse the emojis!';
+        if (emoji) {
+            if (!parsed.options.k)
+                parsed.leftover.splice(parsed.leftover.indexOf(a), 1);
 
-    const sendJumbo = i => {
-        if (!emojis[i])
-            return;
+            return emoji;
+        }
+    }).filter(e => e).map(e => {
+        return {
+            attachment: e.url,
+            name: `${e.name}-${e.id}.png`
+        };
+    });
 
-        msg.channel.send({ files: [
-            {
-                attachment: emojis[i].url,
-                name: `${emojis[i].name}.png`
-            }
-        ]}).then(() => {
-            if (i < 1)
-                msg.delete();
+    if (files.length < 1)
+        throw 'Could not parse emojis!';
 
-            sendJumbo(i + 1);
-        }).catch(msg.error);
-    };
-
-    sendJumbo(0);
+    msg.channel.send(parsed.leftover.join(' '), { files }).then(() => msg.delete());
 };
 
 exports.info = {
     name: 'jumbo',
-    usage: 'jumbo <emojis>',
+    usage: 'jumbo [-k] <emojis>',
     description: 'Sends the emojis as image attachments',
-    aliases: ['j', 'large']
+    aliases: ['j', 'large'],
+    options: [
+        {
+            name: '-k',
+            usage: '-k',
+            description: 'Keep emojis in the chat content'
+        }
+    ]
 };
