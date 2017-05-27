@@ -203,11 +203,12 @@
 ## Tags  
 ### `tag`  
 *Description:* `Displays a saved tag (optionally append to prefix)`  
-*Usage:* `tag <name> [prefix]`
+*Usage:* `tag <name> [prefix]`  
+*Aliases:* `t`
 
 ### `tags`  
 *Description:* `Controls or lists your shortcuts`  
-*Usage:* `tags [add|delete] [name] [contents]`
+*Usage:* `tags [-v] [add|delete] [name] [contents]`
 
 ## Utility  
 ### `avatar`  

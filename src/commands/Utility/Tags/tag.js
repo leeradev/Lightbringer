@@ -18,5 +18,6 @@ exports.run = (bot, msg, args) => {
 exports.info = {
     name: 'tag',
     usage: 'tag <name> [prefix]',
-    description: 'Displays a saved tag (optionally append to prefix)'
+    description: 'Displays a saved tag (optionally append to prefix)',
+    aliases: ['t']
 };
