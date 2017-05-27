@@ -27,7 +27,6 @@ exports.run = (bot, msg, args) => {
         const data = JSON.parse(res.body);
 
         const title = mapping[i].title;
-        console.log(require('util').inspect(data, { depth: 0 }));
         const source = data.data[mapping[i].source];
         const thing = source[Math.round(Math.random() * (source.length - 1))];
 

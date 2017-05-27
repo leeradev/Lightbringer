@@ -18,7 +18,6 @@ exports.run = (bot, msg, args) => {
             expressions[i] = (parsed.options.n ? (bot.utils.pad('  ', i + 1) + ' : ') : '') + expressions[i];
             results.push((parsed.options.n ? (bot.utils.pad('  ', i + 1) + ' : ') : '') + (typeof result == 'function' ? '<Function>' : result.toString()));
         } catch(e) {
-            console.log(i);
             return msg.error(e + ` (line ${i + 1})`);
         }
     }
