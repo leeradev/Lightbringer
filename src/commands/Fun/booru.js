@@ -17,7 +17,7 @@ exports.run = (bot, msg, args) => {
     const site = parsed.options.s ? parsed.options.s : 'gb';
     const tags = parsed.leftover;
 
-    msg.edit(bot.consts.phrase('searching_x', { x: tags })).then(() => {
+    msg.edit(bot.consts.phrase('searching_x', { x: tags.join(', ') })).then(() => {
         booru.search(site, tags, {
             limit: 1,
             random: true
@@ -65,8 +65,12 @@ exports.run = (bot, msg, args) => {
                 )
             }).catch(msg.error);
         }).catch(err => {
-            console.error(err.name === 'booruError' ? err.message : err);
-            msg.error('Unexpected error occurred. See console.');
+            if (err.name === 'booruError') {
+                msg.error(err.message);
+            } else {
+                console.error(err);
+                msg.error('Unexpected error occurred. See console.');
+            }
         });
     });
 };
