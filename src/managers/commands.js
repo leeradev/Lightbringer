@@ -1,6 +1,7 @@
 const path = require('path');
 const chalk = require('chalk');
 const read = require('readdir-recursive');
+const Discord = require('discord.js');
 
 class CommandManager {
 
@@ -88,22 +89,27 @@ class CommandManager {
         return this._commands.find(c => c.info[key] && c.info[key].includes(value));
     }
 
-    execute(msg, command, args) {
-        msg.error = ((message, delay) => {
-            this.bot.logger.severe(message.toString());
-            msg.edit(`❌\u2000${message || 'Something failed!'}`)
-                .then(m => m.delete(delay || 8000));
-        }).bind(msg);
+    execute(msg, command, args, ...extended) {
+        if (msg instanceof Discord.Message) {
+            msg.error = ((message, delay) => {
+                this.bot.logger.severe(message.toString());
+                msg.edit(`❌\u2000${message || 'Something failed!'}`)
+                    .then(m => m.delete(delay || 8000));
+            }).bind(msg);
 
-        msg.success = ((message, delay) => {
-            msg.edit(`✅\u2000${message || 'Success!'}`)
-                .then(m => m.delete(delay || 8000));
-        }).bind(msg);
+            msg.success = ((message, delay) => {
+                msg.edit(`✅\u2000${message || 'Success!'}`)
+                    .then(m => m.delete(delay || 8000));
+            }).bind(msg);
+        }
 
         try {
-            command.run(this.bot, msg, args);
+            command.run(this.bot, msg, args, ...extended);
         } catch (e) {
-            msg.error(e);
+            if (msg instanceof Discord.Message)
+                msg.error(e);
+            else
+                console.error(e);
         }
     }
 

@@ -1,13 +1,17 @@
 const filesize = require('filesize');
 
-exports.run = (bot, msg, args) => {
-    if (msg.guild)
+exports.run = (bot, msg, args, auto = undefined) => {
+    if (auto)
+        bot.utils.assertEmbedPermission(auto.target, auto.target.guild.me);
+    else
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
 
     const parsed = bot.utils.parseArgs(args, ['c']);
-    const channel = bot.channels.get(parsed.leftover[1]) || msg.channel;
+    const channel = bot.channels.get(parsed.leftover[1]) || (auto ? auto.channel : msg.channel);
 
-    bot.utils.getMsg(channel, parsed.leftover[0], msg.id).then(m => {
+    new Promise(resolve =>
+        auto ? resolve(auto.msg) : resolve(bot.utils.getMsg(channel, parsed.leftover[0], msg.id))
+    ).then(m => {
         const options = {
             thumbnail: m.author.displayAvatarURL,
             timestamp: m.editedTimestamp || m.createdTimestamp
@@ -25,7 +29,7 @@ exports.run = (bot, msg, args) => {
             }
         ];
 
-        if (channel.id != msg.channel.id)
+        if (channel.id != (auto ? auto.target.id : msg.channel.id))
             nestedFields[0].fields.push(
                 {
                     name: 'Channel',
@@ -33,7 +37,7 @@ exports.run = (bot, msg, args) => {
                 }
             );
 
-        if (channel.type == 'text' && channel.guild.id != msg.guild.id)
+        if (channel.type == 'text' && channel.guild.id != (auto ? auto.target.guild.id : msg.guild.id))
             nestedFields[0].fields.push(
                 {
                     name: 'Guild',
@@ -56,11 +60,16 @@ exports.run = (bot, msg, args) => {
                 }
             );
 
-        msg.edit(msg.content, { embed:
-            bot.utils.formatEmbed('', parsed.options.c ? m.cleanContent : m.toString(), nestedFields, options)
-                .setAuthor(`${m.author.tag} (${m.author.id})`, m.author.displayAvatarURL)
-        }).catch(msg.error);
-    }).catch(msg.error);
+        const embed = bot.utils.formatEmbed('', parsed.options.c ? m.cleanContent : m.toString(), nestedFields, options)
+            .setAuthor(`${m.author.tag} (${m.author.id})`, m.author.displayAvatarURL);
+
+        if (auto)
+            auto.target.send({ embed }).catch(err => console.error(err.stack));
+        else
+            msg.edit(msg.content, { embed }).catch(msg.error);
+    }).catch(err =>
+        msg ? msg.error : console.error(err.stack)
+    );
 };
 
 exports.info = {

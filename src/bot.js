@@ -106,7 +106,11 @@ const assertMentionLog = (_, msg) => {
                 }
             }).then(log => {
                 if (log) {
-                    bot.channels.get(config.mentionLogChannel).send(`${config.prefix}q -c ${msg.id} ${msg.channel.id}`);
+                    bot.commands.execute(undefined, bot.commands.get('q'), ['-c'], {
+                        msg,
+                        channel: msg.channel,
+                        target: bot.channels.get(config.mentionLogChannel)
+                    });
                     stats.increment('mentions');
                 }
             });
@@ -190,13 +194,7 @@ bot.on('disconnect', event => {
     process.exit(42); // Restart bot on disconnect
 });
 
-process.on('uncaughtException', err => {
-    const errorMsg = (err ? err.stack || err : '').toString().replace(new RegExp(`${__dirname}\/`, 'g'), './');
-    logger.severe(errorMsg);
-});
-
-process.on('unhandledRejection', err => {
-    logger.severe('Uncaught Promise error: \n' + err.stack);
-});
+process.on('uncaughtException', err => logger.severe(err.stack));
+process.on('unhandledRejection', err => logger.severe('Uncaught Promise error: \n' + err.stack));
 
 config && bot.login(config.botToken);
