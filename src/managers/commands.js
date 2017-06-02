@@ -99,7 +99,10 @@ class CommandManager {
 
             msg.success = ((message, delay) => {
                 msg.edit(`✅\u2000${message || 'Success!'}`)
-                    .then(m => m.delete(delay || 8000));
+                    .then(m => {
+                        if (delay !== -1)
+                            m.delete(delay || 8000);
+                    });
             }).bind(msg);
         }
 

@@ -1,17 +1,20 @@
 const filesize = require('filesize');
 
 exports.run = (bot, msg, args, auto = undefined) => {
-    if (auto)
+    if (auto && auto.target.guild)
         bot.utils.assertEmbedPermission(auto.target, auto.target.guild.me);
-    else
+    else if (msg.guild)
         bot.utils.assertEmbedPermission(msg.channel, msg.member);
 
     const parsed = bot.utils.parseArgs(args, ['c']);
     const channel = bot.channels.get(parsed.leftover[1]) || (auto ? auto.channel : msg.channel);
 
-    new Promise(resolve =>
-        auto ? resolve(auto.msg) : resolve(bot.utils.getMsg(channel, parsed.leftover[0], msg.id))
-    ).then(m => {
+    new Promise((resolve, reject) => {
+        if (auto)
+            resolve(auto.msg);
+        else
+            bot.utils.getMsg(channel, parsed.leftover[0], msg.id).then(resolve).catch(reject);
+    }).then(m => {
         const options = {
             thumbnail: m.author.displayAvatarURL,
             timestamp: m.editedTimestamp || m.createdTimestamp
@@ -68,7 +71,7 @@ exports.run = (bot, msg, args, auto = undefined) => {
         else
             msg.edit(msg.content, { embed }).catch(msg.error);
     }).catch(err =>
-        msg ? msg.error : console.error(err.stack)
+        msg ? msg.error(err) : console.error(err.stack)
     );
 };
 

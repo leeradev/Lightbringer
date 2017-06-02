@@ -4,6 +4,8 @@ const truncate = require('truncate');
 const encodeUrl = require('encodeurl');
 const moment = require('moment');
 const humanizeDuration = require('humanize-duration');
+const snekfetch = require('snekfetch');
+const stripIndents = require('common-tags').stripIndents;
 
 exports.randomSelection = choices => {
     return choices[Math.floor(Math.random() * choices.length)];
@@ -485,6 +487,22 @@ exports.fetchGuildMembers = (guild, cache = false) => {
             });
         }).catch(reject);
     });
+};
+
+exports.haste = (content, suffix = '', raw = false) => {
+    return new Promise((resolve, reject) =>
+        snekfetch.post('https://hastebin.com/documents').send(stripIndents`
+            ${content}
+
+            Dumped with Lightbringer ${process.env.npm_package_version}. Yet another Discord self-bot written with discord.js.
+            https://github.com/BobbyWibowo/Lightbringer
+        `).then(res => {
+            if (!res.body || !res.body.key)
+                return reject('Failed to upload, no key was returned!');
+
+            resolve(`https://hastebin.com/${raw ? 'raw/' : ''}${res.body.key}${suffix ? `.${suffix}` : ''}`);
+        }).catch(reject)
+    );
 };
 
 /**

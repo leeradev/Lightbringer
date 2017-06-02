@@ -128,7 +128,7 @@ exports.info = {
         {
             name: '-i',
             usage: '-i <index>',
-            description: 'Sets the index of which info to show (requires -l and -p to be unset)'
+            description: 'Sets the index of which info to show (not to be used with either -l or -p)'
         }
     ]
 };

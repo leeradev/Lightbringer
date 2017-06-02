@@ -244,7 +244,7 @@
 
 ### `haste`  
 *Description:* `Uploads some text to Hastebin`  
-*Usage:* `haste [-r] <text>`  
+*Usage:* `haste [options] <text>`  
 *Aliases:* `hastebin`
 
 ### `lmgtfy`  
