@@ -15,11 +15,8 @@ exports.run = (bot, msg, args) => {
                 return;
             }
             const key = res.body.key || res.body;
-            if (parsed.options.r) {
-                msg.edit(`✅\u2000https://hastebin.com/raw/${key}`);
-            } else {
-                msg.edit(`✅\u2000https://hastebin.com/${key}`);
-            }
+
+            msg.success(`https://hastebin.com/${parsed.options.r ? 'raw/' : ''}${key}`, 0);
         }).catch(err => {
             msg.error(`Failed to upload: ${err}`, 5000);
         });
