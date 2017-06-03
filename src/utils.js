@@ -547,3 +547,5 @@ exports.haste = (content, suffix = '', raw = false) => {
 exports.cleanUrl = url => encodeUrl(url.replace(/ /g, '+')).replace(/\(/g, '%40').replace(/\)/g, '%41');
 
 exports.toYesNo = bool => bool ? 'yes' : 'no';
+
+exports.toCode = (text, lang = '') => `\`\`\`${lang}\n${text}\n\`\`\``;

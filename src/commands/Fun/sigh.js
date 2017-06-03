@@ -1,5 +1,4 @@
 const ascii = `
-\`\`\`
   _______   _________    _________   ,        ,
  /              |       /            |        |
 |               |      |             |        |
@@ -10,11 +9,10 @@ const ascii = `
          |      |      |         |   |        |
   ______/   ____|____   \\________|   |        |
 \u200b
-\`\`\`
 `;
 
 exports.run = (bot, msg) => {
-    msg.edit(ascii);
+    msg.edit(bot.utils.toCode(ascii));
 };
 
 exports.info = {

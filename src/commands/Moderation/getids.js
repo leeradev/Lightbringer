@@ -20,7 +20,7 @@ exports.run = (bot, msg, args) => {
         let i = 0;
         const content = msgs.map(m => `${bot.utils.pad('  ', ++i)} : ${m.id}`);
 
-        msg.edit(`IDs of the latest ${amount} messages (including this message - newest to oldest):\n\`\`\`\n${content.join('\n')}\n\`\`\``);
+        msg.edit(`IDs of the latest ${amount} messages (including this message - newest to oldest):\n${bot.utils.toCode(content.join('\n'))}`);
     }).catch(msg.error);
 };
 

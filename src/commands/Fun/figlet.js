@@ -8,7 +8,7 @@ exports.run = (bot, msg, args) => {
         if (err)
             return msg.error(err);
 
-        msg.edit(`\`\`\`\n${res}\n\`\`\``);
+        msg.edit(`${bot.utils.toCode(res)}`);
     });
 };
 

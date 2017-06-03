@@ -21,8 +21,8 @@ exports.run = (bot, msg, args) => {
                     bot.utils.embed('', stripIndents`
                         **From:** __\`${parsed.options.f || '[auto]'}\`__
                         **To:** __\`${lang}\`__
-                        **Input:**\n\`\`\`\n${input}\n\`\`\`
-                        **Output:**\n\`\`\`\n${res.text}\n\`\`\`
+                        **Input:**\n${bot.utils.toCode(input)}
+                        **Output:**\n${bot.utils.toCode(res.text)}
                     `)
                 });
             }
