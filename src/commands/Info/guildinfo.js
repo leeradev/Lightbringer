@@ -1,6 +1,6 @@
 const moment = require('moment');
 
-const verificationLevels = ['None', 'Low', 'Medium', '(╯°□°）╯︵ ┻━┻'];
+const verificationLevels = ['None', 'Low', 'Medium', '(╯°□°）╯︵ ┻━┻', '┻━┻ ﾐヽ(ಠ益ಠ)ノ彡┻━┻'];
 const explicitContentFilters = ['No scan', 'Scan from members without a role', 'Scan from all members'];
 
 exports.run = (bot, msg, args) => {
