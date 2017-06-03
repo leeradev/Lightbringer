@@ -45,7 +45,7 @@ exports.run = (bot, msg) => {
                                         },
                                         {
                                             name: 'Uptime',
-                                            value: bot.utils.humanizeDuration(bot.uptime, true)
+                                            value: bot.utils.humanizeDuration(bot.uptime, 3, true)
                                         }
                                     ]
                                 },

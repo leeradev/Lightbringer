@@ -3,7 +3,6 @@ const Discord = require('discord.js');
 const truncate = require('truncate');
 const encodeUrl = require('encodeurl');
 const moment = require('moment');
-const humanizeDuration = require('humanize-duration');
 const snekfetch = require('snekfetch');
 const stripIndents = require('common-tags').stripIndents;
 
@@ -307,31 +306,67 @@ exports.fromNow = date => {
         return moment(date).fromNow();
 };
 
-exports.humanizeDuration = (durationMs, short = false) => {
-    const shortOps = {
-        round: true,
-        spacer: '',
-        delimeter: ' and ',
-        largest: 2,
-        language: 'shortEn',
-        languages: {
-            shortEn: {
-                y:  () => { return 'y'; },
-                mo: () => { return 'mo'; },
-                w:  () => { return 'w'; },
-                d:  () => { return 'd'; },
-                h:  () => { return 'h'; },
-                m:  () => { return 'm'; },
-                s:  () => { return 's'; }
-            }
+exports.humanizeDuration = (ms, maxUnits = undefined, short = false) => {
+    const round = ms > 0 ? Math.floor : Math.ceil;
+    const parsed = [
+        {
+            int: round(ms / 604800000),
+            sin: 'week',
+            plu: 'weeks',
+            sho: 'w'
+        },
+        {
+            int: round(ms / 86400000) % 7,
+            sin: 'day',
+            plu: 'days',
+            sho: 'd'
+        },
+        {
+            int: round(ms / 3600000) % 24,
+            sin: 'hour',
+            plu: 'hours',
+            sho: 'h'
+        },
+        {
+            int: round(ms / 60000) % 60,
+            sin: 'minute',
+            plu: 'minutes',
+            sho: 'm'
+        },
+        {
+            int: (round(ms / 1000) % 60) + (round(ms) % 1000 / 1000),
+            sin: 'second',
+            plu: 'seconds',
+            sho: 's'
         }
-    };
+    ];
 
-    const defaultOps = {
-        round: true
-    };
+    const result = [];
+    for (let i = 0; i < parsed.length; i++) {
+        if (!result.length && parsed[i].int == 0)
+            continue;
 
-    return humanizeDuration(durationMs, short ? shortOps : defaultOps);
+        if (result.length >= maxUnits)
+            break;
+
+        let int = parsed[i].int;
+        if (i == parsed.length - 1 && !result.length)
+            int = int.toFixed(1);
+        else
+            int = int.toFixed(0);
+
+        result.push(`${int}${short ? parsed[i].sho : ' ' + (int == 1 ? parsed[i].sin : parsed[i].plu)}`);
+    }
+
+    return result.map((res, i) => {
+        if (!short) {
+            if (i == result.length - 2)
+                return res + ' and';
+            else if (i != result.length - 1)
+                return res + ',';
+        }
+        return res;
+    }).join(' ');
 };
 
 /**

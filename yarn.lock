@@ -1434,10 +1434,6 @@ http-signature@~1.1.0:
     jsprim "^1.2.2"
     sshpk "^1.7.0"
 
-humanize-duration@^3.10.0:
-  version "3.10.0"
-  resolved "https://registry.yarnpkg.com/humanize-duration/-/humanize-duration-3.10.0.tgz#4d15bccaefcb12401b4d80475cf6c49a039e3959"
-
 i@0.3.x:
   version "0.3.5"
   resolved "https://registry.yarnpkg.com/i/-/i-0.3.5.tgz#1d2b854158ec8169113c6cb7f6b6801e99e211d5"
@@ -2052,9 +2048,9 @@ map-cache@^0.2.0:
   version "0.2.2"
   resolved "https://registry.yarnpkg.com/map-cache/-/map-cache-0.2.2.tgz#c32abd0bd6525d9b051645bb4f26ac5dc98a0dbf"
 
-mathjs@^3.13.1:
-  version "3.13.1"
-  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.13.1.tgz#591ad98c80e87c5d5997eb626137b1efad44ae71"
+mathjs@^3.13.3:
+  version "3.13.3"
+  resolved "https://registry.yarnpkg.com/mathjs/-/mathjs-3.13.3.tgz#39135ea761f57c083da43638248e3f640727e290"
   dependencies:
     complex.js "2.0.1"
     decimal.js "7.1.1"
@@ -2796,9 +2792,9 @@ slide@^1.1.5:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/slide/-/slide-1.1.6.tgz#56eb027d65b4d2dce6cb2e2d32c4d4afc9e1d707"
 
-snekfetch@^3.0.1, snekfetch@^3.1.0, snekfetch@^3.1.7:
-  version "3.1.7"
-  resolved "https://registry.yarnpkg.com/snekfetch/-/snekfetch-3.1.7.tgz#5eb980d29c3b455bf0b13359647909b0737315e9"
+snekfetch@^3.0.1, snekfetch@^3.1.0, snekfetch@^3.1.8:
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/snekfetch/-/snekfetch-3.1.8.tgz#a871a6208f9ec6ec72e2c61416f40880ee1aea92"
 
 sntp@1.x.x:
   version "1.0.9"
@@ -3023,9 +3019,9 @@ tweetnacl@^0.14.0, tweetnacl@^0.14.3, tweetnacl@~0.14.0:
   version "0.14.5"
   resolved "https://registry.yarnpkg.com/tweetnacl/-/tweetnacl-0.14.5.tgz#5ae68177f192d4456269d108afa93ff8743f4f64"
 
-txtgen@^1.0.8:
-  version "1.0.8"
-  resolved "https://registry.yarnpkg.com/txtgen/-/txtgen-1.0.8.tgz#c161eb7b9dd38a63991e5c988a7491917f9a5e35"
+txtgen@^1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/txtgen/-/txtgen-1.1.0.tgz#8c14cbbcd91d7180705f5b1466d948a8aa329090"
 
 type-check@~0.3.2:
   version "0.3.2"
