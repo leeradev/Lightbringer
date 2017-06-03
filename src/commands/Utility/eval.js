@@ -82,7 +82,7 @@ exports.run = (bot, msg, args) => {
                 }
             ],
             {
-                footer: `Node.js - Time taken: ${timeTaken}`,
+                footer: `${result.output != null ? `Type: ${result.output.constructor.name} | `: ''}Node.js - Execution time: ${timeTaken}`,
                 footerIcon: 'https://a.safe.moe/UBEUl.png',
                 color: '#6cc24a',
                 simple: !parsed.options.e,

@@ -311,33 +311,23 @@ exports.humanizeDuration = (ms, maxUnits = undefined, short = false) => {
     const parsed = [
         {
             int: round(ms / 604800000),
-            sin: 'week',
-            plu: 'weeks',
-            sho: 'w'
+            sin: 'week', plu: 'weeks', sho: 'w'
         },
         {
             int: round(ms / 86400000) % 7,
-            sin: 'day',
-            plu: 'days',
-            sho: 'd'
+            sin: 'day', plu: 'days', sho: 'd'
         },
         {
             int: round(ms / 3600000) % 24,
-            sin: 'hour',
-            plu: 'hours',
-            sho: 'h'
+            sin: 'hour', plu: 'hours', sho: 'h'
         },
         {
             int: round(ms / 60000) % 60,
-            sin: 'minute',
-            plu: 'minutes',
-            sho: 'm'
+            sin: 'minute', plu: 'minutes', sho: 'm'
         },
         {
             int: (round(ms / 1000) % 60) + (round(ms) % 1000 / 1000),
-            sin: 'second',
-            plu: 'seconds',
-            sho: 's'
+            sin: 'second', plu: 'seconds', sho: 's'
         }
     ];
 
